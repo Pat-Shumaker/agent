@@ -17,6 +17,7 @@ client = OpenAI(
 
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
+parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
 args = parser.parse_args()
 # Now we can access `args.user_prompt`
 
@@ -24,11 +25,13 @@ messages=[
     {
         "role": "user",
         "content": args.user_prompt,
-    }
+    },
 ]
 
-response = client.chat.completions.create(model="openrouter/free",
-                               messages=messages)
+response = client.chat.completions.create(
+        model="openrouter/free",
+        messages=messages
+    )
 
 if not response.usage:
     raise RuntimeError("Failed API request")
@@ -36,7 +39,9 @@ if not response.usage:
 prompt_usage = response.usage.prompt_tokens
 response_usage = response.usage.completion_tokens
 
-print(f"Prompt tokens: {prompt_usage}\nResponse tokens: {response_usage}")
+if args.verbose == True:
+    print(f"User prompt: {args.user_prompt}")
+    print(f"Prompt tokens: {prompt_usage}\nResponse tokens: {response_usage}")
 print(response.choices[0].message.content)
 
 def main():
